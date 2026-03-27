@@ -122,8 +122,3 @@ elif page == "👨‍👩‍👧 緊急聯絡人":
 st.markdown("---")
 st.markdown("<div style='text-align:center; color:gray; font-size:16px;'>如有緊急狀況請撥打 165 反詐騙專線</div>",
     unsafe_allow_html=True)
-```
-
-然後終端機跑：
-```
-streamlit run app.py
