@@ -1,4 +1,17 @@
 import streamlit as st
+import pickle
+import jieba
+
+# 載入模型
+@st.cache_resource
+def load_model():
+    with open('fraud_model.pkl', 'rb') as f:
+        model = pickle.load(f)
+    with open('vectorizer.pkl', 'rb') as f:
+        vectorizer = pickle.load(f)
+    return model, vectorizer
+
+model, vectorizer = load_model()
 
 # 頁面設定
 st.set_page_config(page_title="防詐守護", page_icon="🛡️", layout="centered")
@@ -6,65 +19,23 @@ st.set_page_config(page_title="防詐守護", page_icon="🛡️", layout="cente
 # 大字體 CSS
 st.markdown("""
     <style>
-    html, body, [class*="css"] {
-        font-size: 22px;
-    }
-    .title {
-        font-size: 48px;
-        font-weight: bold;
-        text-align: center;
-        color: #1a1a1a;
-    }
-    .subtitle {
-        font-size: 24px;
-        text-align: center;
-        color: #555;
-    }
-    .status-on {
-        font-size: 28px;
-        color: green;
-        text-align: center;
-        font-weight: bold;
-        padding: 10px;
-    }
-    .status-off {
-        font-size: 28px;
-        color: gray;
-        text-align: center;
-        font-weight: bold;
-        padding: 10px;
-    }
-    .stButton > button {
-        font-size: 24px;
-        padding: 16px 40px;
-        border-radius: 12px;
-        width: 100%;
-    }
-    .alert {
-        font-size: 26px;
-        color: red;
-        font-weight: bold;
-        text-align: center;
-        padding: 20px;
-    }
-    .safe {
-        font-size: 26px;
-        color: green;
-        font-weight: bold;
-        text-align: center;
-        padding: 20px;
-    }
+    html, body, [class*="css"] { font-size: 22px; }
+    .title { font-size: 48px; font-weight: bold; text-align: center; }
+    .subtitle { font-size: 24px; text-align: center; color: #555; }
+    .status-on { font-size: 28px; color: green; text-align: center; font-weight: bold; padding: 10px; }
+    .status-off { font-size: 28px; color: gray; text-align: center; font-weight: bold; padding: 10px; }
+    .stButton > button { font-size: 24px; padding: 16px 40px; border-radius: 12px; width: 100%; }
+    .alert { font-size: 26px; color: red; font-weight: bold; text-align: center; padding: 20px; }
+    .safe { font-size: 26px; color: green; font-weight: bold; text-align: center; padding: 20px; }
     </style>
 """, unsafe_allow_html=True)
 
-# 詐騙關鍵字（從卡方結果取出）
-FRAUD_KEYWORDS = [
-    "ATM", "解除", "匯款", "轉帳", "帳戶異常", "點數", "獲利", "投資",
-    "擔保金", "凍結", "金管會", "線上授權", "分期付款", "操作錯誤",
-    "核實", "專員", "主任", "啟動資金", "高階專案", "入金", "提領",
-    "第三方", "工程師", "財力證明", "獎金", "兌換", "升級會員",
-    "保證獲利", "主力", "飆股", "黑馬股", "加LINE", "私加"
-]
+# 預測函數
+def predict(text):
+    tokens = ' '.join(jieba.cut(text))
+    X = vectorizer.transform([tokens])
+    prob = model.predict_proba(X)[0][1]
+    return prob
 
 # 標題
 st.markdown('<div class="title">🛡️ 防詐守護</div>', unsafe_allow_html=True)
@@ -92,33 +63,67 @@ st.markdown("---")
 
 # 頁面切換
 page = st.radio("選擇功能", ["📩 訊息偵測", "📞 通話內容偵測", "👨‍👩‍👧 緊急聯絡人"], horizontal=True)
-
 st.markdown("---")
+
+def analyze(text):
+    prob = predict(text)
+    risk = int(prob * 100)
+
+    if prob >= 0.5:
+        st.markdown('<div class="alert">🚨 警告！偵測到詐騙風險！</div>', unsafe_allow_html=True)
+        st.progress(prob)
+        st.markdown(f"**詐騙機率：{risk}%**")
+        st.error("建議：請勿匯款或轉帳，立即撥打 **165** 反詐騙專線，通知家人確認")
+    else:
+        st.markdown('<div class="safe">✅ 未偵測到明顯詐騙風險</div>', unsafe_allow_html=True)
+        st.progress(prob)
+        st.markdown(f"**詐騙機率：{risk}%**")
+        st.info("仍請保持警覺，如有疑慮請撥打 165")
 
 if page == "📩 訊息偵測":
     st.markdown("### 📩 輸入可疑訊息")
-    user_input = st.text_area(
-        "請貼上收到的訊息：",
-        height=180,
-        placeholder="例如：您的帳戶異常，請立即操作ATM解除..."
-    )
-
+    user_input = st.text_area("請貼上收到的訊息：", height=180,
+        placeholder="例如：您的帳戶異常，請立即操作ATM解除...")
     if st.button("🔍 立即分析"):
         if not st.session_state.detect_on:
             st.warning("⚠️ 請先開啟偵測功能")
         elif user_input.strip() == "":
             st.warning("⚠️ 請輸入訊息內容")
         else:
-            hit = [kw for kw in FRAUD_KEYWORDS if kw in user_input]
-            risk_score = min(len(hit) / 3, 1.0)
+            analyze(user_input)
 
-            if hit:
-                st.markdown('<div class="alert">🚨 警告！偵測到詐騙風險！</div>', unsafe_allow_html=True)
-                st.error(f"偵測到關鍵字：{', '.join(hit)}")
-                st.progress(risk_score)
-                st.markdown(f"**風險程度：{int(risk_score*100)}%**")
-                st.markdown("---")
-                st.markdown("**建議：**")
-                st.markdown("- 請勿匯款或轉帳")
-                st.markdown("- 立即撥打 **165** 反詐騙專線")
-                st.ma
+elif page == "📞 通話內容偵測":
+    st.markdown("### 📞 輸入通話內容")
+    call_input = st.text_area("請輸入通話中對方說的話：", height=180,
+        placeholder="例如：您好，我是金管會人員，您的帳戶涉嫌洗錢...")
+    if st.button("🔍 立即分析"):
+        if not st.session_state.detect_on:
+            st.warning("⚠️ 請先開啟偵測功能")
+        elif call_input.strip() == "":
+            st.warning("⚠️ 請輸入通話內容")
+        else:
+            analyze(call_input)
+
+elif page == "👨‍👩‍👧 緊急聯絡人":
+    st.markdown("### 👨‍👩‍👧 緊急聯絡人")
+    st.markdown("當偵測到高風險訊息時，將自動通知以下聯絡人")
+    st.markdown("---")
+    with st.form("contact_form"):
+        name = st.text_input("聯絡人姓名", placeholder="例如：王小明")
+        phone = st.text_input("聯絡人電話", placeholder="例如：0912345678")
+        relation = st.selectbox("關係", ["子女", "配偶", "兄弟姐妹", "其他"])
+        submitted = st.form_submit_button("💾 儲存聯絡人")
+        if submitted:
+            if name and phone:
+                st.success(f"✅ 已儲存聯絡人：{name}（{relation}）{phone}")
+            else:
+                st.warning("請填寫完整資料")
+
+st.markdown("---")
+st.markdown("<div style='text-align:center; color:gray; font-size:16px;'>如有緊急狀況請撥打 165 反詐騙專線</div>",
+    unsafe_allow_html=True)
+```
+
+然後終端機跑：
+```
+streamlit run app.py
