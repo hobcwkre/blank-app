@@ -23,236 +23,158 @@ s2tw = opencc.OpenCC('s2tw')
 st.set_page_config(page_title="守護長輩", layout="centered", initial_sidebar_state="collapsed")
 
 st.markdown("""
-    <style>
-    /* 隱藏 Streamlit 預設元素 */
-    #MainMenu, footer, header { visibility: hidden; }
-    .stDeployButton { display: none; }
-    section[data-testid="stSidebar"] { display: none; }
-
-    html, body, [class*="css"] {
-        font-size: 16px;
-        background-color: #f0f2f5;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    }
-    .block-container {
-        padding: 0 0 120px 0 !important;
-        max-width: 480px !important;
-        margin: auto !important;
-    }
-
-    /* 頂部列 */
-    .top-bar {
-        background: white;
-        padding: 16px 20px 12px;
-        position: sticky;
-        top: 0;
-        z-index: 100;
-        border-bottom: 1px solid #f0f0f0;
-    }
-    .top-title { font-size: 20px; font-weight: 700; color: #1a1a1a; }
-    .top-sub { font-size: 13px; color: #999; margin-top: 2px; }
-
-    /* 盾牌區域 */
-    .shield-wrap {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 32px 0 20px;
-        background: white;
-        margin-bottom: 12px;
-    }
-    .shield-circle {
-        width: 160px; height: 160px;
-        border-radius: 50%;
-        background: #e8edf5;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 16px;
-        transition: all 0.3s;
-    }
-    .shield-circle-on {
-        background: linear-gradient(135deg, #4a90e2, #2563eb);
-        box-shadow: 0 8px 32px rgba(74,144,226,0.35);
-    }
-    .shield-svg { width: 72px; height: 72px; }
-    .shield-label {
-        font-size: 15px;
-        font-weight: 600;
-        color: #666;
-        margin-top: 6px;
-    }
-    .shield-label-on { color: white; }
-    .status-pill {
-        padding: 8px 28px;
-        border-radius: 24px;
-        font-size: 14px;
-        font-weight: 600;
-    }
-    .status-pill-on { background: #e8f5e9; color: #2e7d32; }
-    .status-pill-off { background: #f5f5f5; color: #999; }
-
-    /* 功能卡片區 */
-    .card-section {
-        padding: 16px;
-        background: #f0f2f5;
-    }
-    .card-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-    }
-    .nav-card {
-        background: white;
-        border-radius: 20px;
-        padding: 24px 16px 20px;
-        text-align: center;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-    }
-    .nav-card-icon {
-        width: 52px; height: 52px;
-        border-radius: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 12px;
-        font-size: 26px;
-    }
-    .icon-blue { background: #e8f0fe; }
-    .icon-orange { background: #fff3e0; }
-    .icon-purple { background: #f3e5f5; }
-    .icon-teal { background: #e0f7f4; }
-    .nav-card-label { font-size: 16px; font-weight: 700; color: #1a1a1a; }
-    .nav-card-desc { font-size: 12px; color: #999; margin-top: 4px; }
-
-    /* 底部導覽列 */
-    .bottom-nav {
-        position: fixed;
-        bottom: 0; left: 50%;
-        transform: translateX(-50%);
-        width: 100%;
-        max-width: 480px;
-        background: white;
-        border-top: 1px solid #eee;
-        display: flex;
-        justify-content: space-around;
-        padding: 10px 0 16px;
-        z-index: 999;
-        box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
-    }
-    .bnav-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        font-size: 11px;
-        color: #bbb;
-        min-width: 60px;
-    }
-    .bnav-item-active { color: #4a90e2; }
-    .bnav-icon { font-size: 22px; margin-bottom: 3px; }
-
-    /* 按鈕覆蓋 */
-    .stButton > button {
-        border-radius: 14px !important;
-        font-size: 16px !important;
-        padding: 13px !important;
-        width: 100% !important;
-        background-color: #4a90e2 !important;
-        color: white !important;
-        border: none !important;
-        font-weight: 600 !important;
-        box-shadow: 0 4px 12px rgba(74,144,226,0.3) !important;
-    }
-    .stButton > button:hover {
-        background-color: #2563eb !important;
-    }
-
-    /* 隱藏導覽按鈕文字 */
-    .nav-btn-row .stButton > button {
-        background: transparent !important;
-        color: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        padding: 4px !important;
-        font-size: 1px !important;
-        height: 60px !important;
-    }
-
-    /* 內容區塊 */
-    .content-area { padding: 16px; }
-    .section-card {
-        background: white;
-        border-radius: 20px;
-        padding: 20px;
-        margin-bottom: 12px;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-    }
-    .alert-box {
-        background: #fff0f0;
-        border-left: 5px solid #e74c3c;
-        border-radius: 12px;
-        padding: 16px;
-        font-size: 18px;
-        font-weight: 700;
-        color: #c0392b;
-        text-align: center;
-        margin: 12px 0;
-    }
-    .warn-box {
-        background: #fffbf0;
-        border-left: 5px solid #f39c12;
-        border-radius: 12px;
-        padding: 16px;
-        font-size: 18px;
-        font-weight: 700;
-        color: #d68910;
-        text-align: center;
-        margin: 12px 0;
-    }
-    .safe-box {
-        background: #f0fff4;
-        border-left: 5px solid #2ecc71;
-        border-radius: 12px;
-        padding: 16px;
-        font-size: 18px;
-        font-weight: 700;
-        color: #27ae60;
-        text-align: center;
-        margin: 12px 0;
-    }
-    .fraud-item {
-        background: white;
-        border-radius: 16px;
-        padding: 16px;
-        margin-bottom: 10px;
-        box-shadow: 0 1px 6px rgba(0,0,0,0.06);
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
-    }
-    .fraud-icon {
-        width: 44px; height: 44px;
-        border-radius: 12px;
-        background: #fff0f0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 22px;
-        flex-shrink: 0;
-    }
-    .fraud-content {}
-    .fraud-title { font-size: 15px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
-    .fraud-desc { font-size: 13px; color: #666; line-height: 1.5; }
-    .stTextArea textarea {
-        border-radius: 12px !important;
-        font-size: 15px !important;
-        border: 1px solid #eee !important;
-    }
-    </style>
+<style>
+#MainMenu, footer, header { visibility: hidden; }
+.stDeployButton { display: none; }
+html, body, [class*="css"] {
+    font-size: 16px;
+    background-color: #f0f2f5;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+.block-container {
+    padding: 0 0 100px 0 !important;
+    max-width: 480px !important;
+    margin: auto !important;
+}
+.top-bar {
+    background: white;
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 0;
+}
+.top-title { font-size: 20px; font-weight: 700; color: #1a1a1a; }
+.top-sub { font-size: 13px; color: #999; margin-top: 2px; }
+.shield-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 0 20px;
+    background: white;
+    margin-bottom: 12px;
+}
+.shield-circle {
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: #e8edf5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    font-size: 64px;
+}
+.shield-circle-on {
+    background: linear-gradient(135deg, #4a90e2, #2563eb);
+    box-shadow: 0 8px 32px rgba(74,144,226,0.35);
+}
+.shield-label { font-size: 15px; font-weight: 600; color: #666; margin-top: 4px; }
+.shield-label-on { color: white; }
+.status-pill {
+    padding: 8px 28px;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 600;
+}
+.status-pill-on { background: #e8f5e9; color: #2e7d32; }
+.status-pill-off { background: #f5f5f5; color: #999; }
+.card-section { padding: 12px 16px; }
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.nav-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px 12px 16px;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.nav-card-icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+    font-size: 26px;
+}
+.icon-blue { background: #e8f0fe; }
+.icon-orange { background: #fff3e0; }
+.icon-purple { background: #f3e5f5; }
+.icon-teal { background: #e0f7f4; }
+.nav-card-label { font-size: 16px; font-weight: 700; color: #1a1a1a; }
+.nav-card-desc { font-size: 12px; color: #999; margin-top: 4px; }
+.bottom-nav {
+    position: fixed;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 100%; max-width: 480px;
+    background: white;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 0 14px;
+    z-index: 999;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
+}
+.bnav-item {
+    display: flex; flex-direction: column;
+    align-items: center;
+    font-size: 11px; color: #bbb;
+    min-width: 60px; cursor: pointer;
+}
+.bnav-item-active { color: #4a90e2; }
+.bnav-icon { font-size: 22px; margin-bottom: 2px; }
+.stButton > button {
+    border-radius: 14px !important;
+    font-size: 16px !important;
+    padding: 13px !important;
+    width: 100% !important;
+    background-color: #4a90e2 !important;
+    color: white !important;
+    border: none !important;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 12px rgba(74,144,226,0.3) !important;
+    margin-top: 8px !important;
+}
+.alert-box {
+    background: #fff0f0; border-left: 5px solid #e74c3c;
+    border-radius: 12px; padding: 16px;
+    font-size: 18px; font-weight: 700; color: #c0392b;
+    text-align: center; margin: 12px 0;
+}
+.warn-box {
+    background: #fffbf0; border-left: 5px solid #f39c12;
+    border-radius: 12px; padding: 16px;
+    font-size: 18px; font-weight: 700; color: #d68910;
+    text-align: center; margin: 12px 0;
+}
+.safe-box {
+    background: #f0fff4; border-left: 5px solid #2ecc71;
+    border-radius: 12px; padding: 16px;
+    font-size: 18px; font-weight: 700; color: #27ae60;
+    text-align: center; margin: 12px 0;
+}
+.fraud-item {
+    background: white; border-radius: 16px;
+    padding: 16px; margin-bottom: 10px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    display: flex; align-items: flex-start; gap: 12px;
+}
+.fraud-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: #fff0f0; display: flex;
+    align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+}
+.fraud-title { font-size: 15px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
+.fraud-desc { font-size: 13px; color: #666; line-height: 1.5; }
+.content-area { padding: 16px; }
+.section-card {
+    background: white; border-radius: 20px;
+    padding: 20px; margin-bottom: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+</style>
 """, unsafe_allow_html=True)
 
-# 函數定義
 def predict_xgb(text):
     text_tw = s2tw.convert(text)
     tokens = ' '.join(jieba.cut(text_tw))
@@ -323,7 +245,6 @@ def show_result(text):
     if score >= 0.4:
         st.error("請勿匯款或轉帳，立即撥打 165 反詐騙專線，通知家人確認")
 
-# Session state
 if 'page' not in st.session_state:
     st.session_state.page = "首頁"
 if 'detect_on' not in st.session_state:
@@ -331,23 +252,15 @@ if 'detect_on' not in st.session_state:
 
 page = st.session_state.page
 
-# 底部導覽列 HTML
+# 底部導覽 HTML（純顯示用）
 nav_pages = ["首頁", "聯絡家人", "AI客服", "詐騙百科", "個人中心"]
 nav_icons = ["🏠", "📞", "🤖", "📖", "👤"]
 nav_html = '<div class="bottom-nav">'
-for i, (label, icon) in enumerate(zip(nav_pages, nav_icons)):
+for label, icon in zip(nav_pages, nav_icons):
     active = "bnav-item-active" if page == label else ""
     nav_html += f'<div class="bnav-item {active}"><div class="bnav-icon">{icon}</div>{label}</div>'
 nav_html += '</div>'
 st.markdown(nav_html, unsafe_allow_html=True)
-
-# 導覽按鈕（透明覆蓋）
-cols = st.columns(5)
-for i, (col, label) in enumerate(zip(cols, nav_pages)):
-    with col:
-        if st.button("　", key=f"nav_{i}"):
-            st.session_state.page = label
-            st.rerun()
 
 # 首頁
 if page == "首頁":
@@ -362,36 +275,32 @@ if page == "首頁":
         st.markdown("""
             <div class="shield-wrap">
                 <div class="shield-circle shield-circle-on">
-                    <svg class="shield-svg" viewBox="0 0 24 24" fill="none">
-                        <path d="M12 2L3 6V12C3 16.5 7 20.7 12 22C17 20.7 21 16.5 21 12V6L12 2Z"
-                            fill="white" opacity="0.9"/>
-                        <path d="M9 12L11 14L15 10" stroke="#4a90e2" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                    🛡️
                     <div class="shield-label shield-label-on">守護中</div>
                 </div>
                 <div class="status-pill status-pill-on">🟢 偵測中，您的安全有保障</div>
             </div>
         """, unsafe_allow_html=True)
-        if st.button("關閉守護"):
-            st.session_state.detect_on = False
-            st.rerun()
+        col1, col2, col3 = st.columns([1,2,1])
+        with col2:
+            if st.button("關閉守護"):
+                st.session_state.detect_on = False
+                st.rerun()
     else:
         st.markdown("""
             <div class="shield-wrap">
                 <div class="shield-circle">
-                    <svg class="shield-svg" viewBox="0 0 24 24" fill="none">
-                        <path d="M12 2L3 6V12C3 16.5 7 20.7 12 22C17 20.7 21 16.5 21 12V6L12 2Z"
-                            fill="#b0bec5"/>
-                    </svg>
+                    🛡️
                     <div class="shield-label">開始守護</div>
                 </div>
                 <div class="status-pill status-pill-off">⚪ 請按下方按鈕開始</div>
             </div>
         """, unsafe_allow_html=True)
-        if st.button("開始守護"):
-            st.session_state.detect_on = True
-            st.rerun()
+        col1, col2, col3 = st.columns([1,2,1])
+        with col2:
+            if st.button("開始守護"):
+                st.session_state.detect_on = True
+                st.rerun()
 
     st.markdown("""
         <div class="card-section">
@@ -419,6 +328,23 @@ if page == "首頁":
             </div>
         </div>
     """, unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("📞 聯絡家人"):
+            st.session_state.page = "聯絡家人"
+            st.rerun()
+        if st.button("📖 詐騙百科"):
+            st.session_state.page = "詐騙百科"
+            st.rerun()
+    with col2:
+        if st.button("🤖 AI客服"):
+            st.session_state.page = "AI客服"
+            st.rerun()
+        if st.button("👤 個人中心"):
+            st.session_state.page = "個人中心"
+            st.rerun()
 
 # AI客服
 elif page == "AI客服":
@@ -451,6 +377,9 @@ elif page == "AI客服":
             else:
                 show_result(call_input)
     st.markdown('</div>', unsafe_allow_html=True)
+    if st.button("← 返回首頁"):
+        st.session_state.page = "首頁"
+        st.rerun()
 
 # 聯絡家人
 elif page == "聯絡家人":
@@ -462,16 +391,21 @@ elif page == "聯絡家人":
     """, unsafe_allow_html=True)
     st.markdown('<div class="content-area">', unsafe_allow_html=True)
     st.markdown("""
-        <div class="section-card" style="text-align:center; padding: 40px 20px;">
+        <div class="section-card" style="text-align:center; padding:40px 20px;">
             <div style="font-size:56px; margin-bottom:16px;">👥</div>
             <div style="font-size:18px; font-weight:700; color:#1a1a1a; margin-bottom:8px;">尚未設定緊急聯絡人</div>
             <div style="font-size:14px; color:#999;">請先到個人中心新增聯絡人</div>
         </div>
     """, unsafe_allow_html=True)
-    if st.button("前往設定"):
-        st.session_state.page = "個人中心"
-        st.rerun()
+    col1, col2, col3 = st.columns([1,2,1])
+    with col2:
+        if st.button("前往設定"):
+            st.session_state.page = "個人中心"
+            st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
+    if st.button("← 返回首頁"):
+        st.session_state.page = "首頁"
+        st.rerun()
 
 # 詐騙百科
 elif page == "詐騙百科":
@@ -482,24 +416,36 @@ elif page == "詐騙百科":
         </div>
     """, unsafe_allow_html=True)
     st.markdown('<div class="content-area">', unsafe_allow_html=True)
+
     frauds = [
-        ("📞", "假冒銀行客服詐騙", "詐騙集團假冒銀行客服來電，聲稱帳戶異常需要操作ATM或匯款。銀行不會要求您操作ATM或提供密碼。"),
-        ("🎁", "中獎通知詐騙", "透過簡訊或通訊軟體通知您中了大獎，但需先繳稅金或手續費才能領取獎金。"),
-        ("👥", "假冒親友借錢", "詐騙集團假冒您的家人或朋友，用LINE或電話說急需用錢，要求匯款。"),
-        ("📈", "投資詐騙", "以高獲利、保證獲利為誘餌，要求您加入投資群組或操作不明平台。"),
-        ("🏛️", "假冒公務員詐騙", "假冒警察、檢察官、金管會人員來電，聲稱您涉嫌犯罪需要配合調查或轉帳。"),
+        ("📞", "假冒銀行客服詐騙", "#fff0f0",
+         "詐騙集團假冒銀行客服來電，聲稱帳戶異常需要操作ATM或匯款。",
+         ["銀行不會要求您操作ATM", "銀行不會要求您提供密碼或驗證碼", "如有疑慮請直接撥打銀行官方客服"]),
+        ("🎁", "中獎通知詐騙", "#fff8e1",
+         "透過簡訊或通訊軟體通知您中了大獎，但需先繳費才能領取。",
+         ["真正的抽獎不需要先繳費", "不要點擊來路不明的連結", "向官方管道查證活動真實性"]),
+        ("👥", "假冒親友借錢", "#f3e5f5",
+         "詐騙集團假冒您的家人或朋友，急需用錢要求匯款。",
+         ["先直接撥打親友電話確認", "不要因為緊急就立刻匯款", "視訊通話確認對方身份"]),
+        ("📈", "投資詐騙", "#e8f5e9",
+         "以高獲利、保證獲利為誘餌，要求加入投資群組或操作不明平台。",
+         ["投資一定有風險，沒有保證獲利", "不要加入來路不明的投資群組", "向金管會查詢是否為合法業者"]),
+        ("🏛️", "假冒公務員詐騙", "#e3f2fd",
+         "假冒警察、檢察官、金管會人員來電，聲稱您涉嫌犯罪。",
+         ["檢警不會用電話辦案", "不會要求您轉帳或監管帳戶", "接到此類電話請直接撥165查證"]),
     ]
-    for icon, title, desc in frauds:
-        st.markdown(f"""
-            <div class="fraud-item">
-                <div class="fraud-icon">{icon}</div>
-                <div class="fraud-content">
-                    <div class="fraud-title">{title}</div>
-                    <div class="fraud-desc">{desc}</div>
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
+
+    for icon, title, bg, desc, tips in frauds:
+        with st.expander(f"{icon} {title}"):
+            st.markdown(f"**{desc}**")
+            st.markdown("**注意事項：**")
+            for tip in tips:
+                st.markdown(f"- {tip}")
+
     st.markdown('</div>', unsafe_allow_html=True)
+    if st.button("← 返回首頁"):
+        st.session_state.page = "首頁"
+        st.rerun()
 
 # 個人中心
 elif page == "個人中心":
@@ -510,14 +456,18 @@ elif page == "個人中心":
         </div>
     """, unsafe_allow_html=True)
     st.markdown('<div class="content-area">', unsafe_allow_html=True)
+
     st.markdown('<div class="section-card">', unsafe_allow_html=True)
     st.markdown("**帳號類型**")
     col1, col2 = st.columns(2)
     with col1:
-        st.button("👴 我是長者", key="role_elder")
+        if st.button("👴 我是長者"):
+            st.success("已設定為長者帳號")
     with col2:
-        st.button("👨‍👩‍👧 我是家屬", key="role_family")
+        if st.button("👨‍👩‍👧 我是家屬"):
+            st.success("已設定為家屬帳號")
     st.markdown('</div>', unsafe_allow_html=True)
+
     st.markdown('<div class="section-card">', unsafe_allow_html=True)
     with st.form("contact_form"):
         st.markdown("**新增緊急聯絡人**")
@@ -532,3 +482,13 @@ elif page == "個人中心":
                 st.warning("請填寫完整資料")
     st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
+    if st.button("← 返回首頁"):
+        st.session_state.page = "首頁"
+        st.rerun()
+
+st.markdown("""
+    <div style='text-align:center; color:#bbb; font-size:12px; padding: 8px 0 20px;'>
+        如有緊急狀況請撥打 165 反詐騙專線
+    </div>
+""", unsafe_allow_html=True)
