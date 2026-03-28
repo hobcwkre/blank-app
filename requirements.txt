@@ -2,3 +2,5 @@ streamlit
 jieba
 xgboost
 scikit-learn
+KeyMojiAPI
+opencc-python-reimplemented
