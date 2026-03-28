@@ -423,3 +423,112 @@ if page == "首頁":
 # AI客服
 elif page == "AI客服":
     st.markdown("""
+        <div class="top-bar">
+            <div class="top-title">🤖 AI防詐幫手</div>
+            <div class="top-sub">告訴我發生了什麼，我來幫您判斷</div>
+        </div>
+    """, unsafe_allow_html=True)
+    st.markdown('<div class="content-area">', unsafe_allow_html=True)
+    tab1, tab2 = st.tabs(["📩 訊息偵測", "📞 通話偵測"])
+    with tab1:
+        user_input = st.text_area("請貼上收到的訊息：", height=150,
+            placeholder="例如：您的帳戶異常，請立即操作ATM解除...")
+        if st.button("立即分析", key="msg"):
+            if not st.session_state.detect_on:
+                st.warning("請先回首頁開啟守護功能")
+            elif user_input.strip() == "":
+                st.warning("請輸入訊息內容")
+            else:
+                show_result(user_input)
+    with tab2:
+        call_input = st.text_area("請輸入通話中對方說的話：", height=150,
+            placeholder="例如：我是金管會人員，您的帳戶涉嫌洗錢...")
+        if st.button("立即分析", key="call"):
+            if not st.session_state.detect_on:
+                st.warning("請先回首頁開啟守護功能")
+            elif call_input.strip() == "":
+                st.warning("請輸入通話內容")
+            else:
+                show_result(call_input)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# 聯絡家人
+elif page == "聯絡家人":
+    st.markdown("""
+        <div class="top-bar">
+            <div class="top-title">📞 聯絡家人</div>
+            <div class="top-sub">直接打電話給家人</div>
+        </div>
+    """, unsafe_allow_html=True)
+    st.markdown('<div class="content-area">', unsafe_allow_html=True)
+    st.markdown("""
+        <div class="section-card" style="text-align:center; padding: 40px 20px;">
+            <div style="font-size:56px; margin-bottom:16px;">👥</div>
+            <div style="font-size:18px; font-weight:700; color:#1a1a1a; margin-bottom:8px;">尚未設定緊急聯絡人</div>
+            <div style="font-size:14px; color:#999;">請先到個人中心新增聯絡人</div>
+        </div>
+    """, unsafe_allow_html=True)
+    if st.button("前往設定"):
+        st.session_state.page = "個人中心"
+        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# 詐騙百科
+elif page == "詐騙百科":
+    st.markdown("""
+        <div class="top-bar">
+            <div class="top-title">📖 詐騙百科</div>
+            <div class="top-sub">認識常見詐騙，保護自己</div>
+        </div>
+    """, unsafe_allow_html=True)
+    st.markdown('<div class="content-area">', unsafe_allow_html=True)
+    frauds = [
+        ("📞", "假冒銀行客服詐騙", "詐騙集團假冒銀行客服來電，聲稱帳戶異常需要操作ATM或匯款。銀行不會要求您操作ATM或提供密碼。"),
+        ("🎁", "中獎通知詐騙", "透過簡訊或通訊軟體通知您中了大獎，但需先繳稅金或手續費才能領取獎金。"),
+        ("👥", "假冒親友借錢", "詐騙集團假冒您的家人或朋友，用LINE或電話說急需用錢，要求匯款。"),
+        ("📈", "投資詐騙", "以高獲利、保證獲利為誘餌，要求您加入投資群組或操作不明平台。"),
+        ("🏛️", "假冒公務員詐騙", "假冒警察、檢察官、金管會人員來電，聲稱您涉嫌犯罪需要配合調查或轉帳。"),
+    ]
+    for icon, title, desc in frauds:
+        st.markdown(f"""
+            <div class="fraud-item">
+                <div class="fraud-icon">{icon}</div>
+                <div class="fraud-content">
+                    <div class="fraud-title">{title}</div>
+                    <div class="fraud-desc">{desc}</div>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# 個人中心
+elif page == "個人中心":
+    st.markdown("""
+        <div class="top-bar">
+            <div class="top-title">👤 個人中心</div>
+            <div class="top-sub">帳號和聯絡人設定</div>
+        </div>
+    """, unsafe_allow_html=True)
+    st.markdown('<div class="content-area">', unsafe_allow_html=True)
+    st.markdown('<div class="section-card">', unsafe_allow_html=True)
+    st.markdown("**帳號類型**")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.button("👴 我是長者", key="role_elder")
+    with col2:
+        st.button("👨‍👩‍👧 我是家屬", key="role_family")
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-card">', unsafe_allow_html=True)
+    with st.form("contact_form"):
+        st.markdown("**新增緊急聯絡人**")
+        name = st.text_input("聯絡人姓名", placeholder="例如：王小明")
+        phone = st.text_input("聯絡人電話", placeholder="例如：0912345678")
+        relation = st.selectbox("關係", ["子女", "配偶", "兄弟姐妹", "其他"])
+        submitted = st.form_submit_button("儲存聯絡人")
+        if submitted:
+            if name and phone:
+                st.success(f"已儲存聯絡人：{name}（{relation}）{phone}")
+            else:
+                st.warning("請填寫完整資料")
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
