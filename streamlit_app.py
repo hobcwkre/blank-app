@@ -153,7 +153,7 @@ def get_keyword_density(text):
         "保證獲利", "主力", "飆股", "加LINE"
     ]
     hit = [kw for kw in keywords if kw in text]
-    density = min(len(hit) / 5, 1.0)
+    density = min(len(hit) / 3, 1.0)
     return float(density), hit
 
 def get_emotion_score(text):
